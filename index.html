@@ -1,356 +1,1497 @@
-  
+
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport"
- content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Strike Zone 3D</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#080d13;color:white;
-font-family:Arial,sans-serif;overflow:hidden}
-button{background:#182b3c;color:white;border:1px solid #456079;
-padding:12px;border-radius:7px;font-weight:bold;cursor:pointer}
-button:active{background:#287d91}
-#game{position:fixed;inset:0}
-#ui{position:fixed;inset:0;pointer-events:none}
-.panel{pointer-events:auto;background:#101b28ee;
-border:1px solid #345064;border-radius:12px;padding:20px}
-#menu{position:absolute;inset:0;display:flex;
-align-items:center;justify-content:center;
-background:linear-gradient(90deg,#07101bee,#07101b88,#07101b22)}
-.content{width:min(550px,90vw)}
-h1{font-size:clamp(32px,6vw,64px);margin:0 0 8px}
-h1 span{color:#50d9d0}
-p{color:#b6c6d5}
-.buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-#top{position:absolute;top:12px;left:12px;right:12px;
-display:none;justify-content:space-between;align-items:center}
-#catalog{position:absolute;inset:5%;display:none;
-overflow:auto;pointer-events:auto}
-#items{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-#items button{font-size:12px;min-height:60px}
-#cross{position:absolute;top:50%;left:50%;
-transform:translate(-50%,-50%);font-size:24px;color:#fff}
-#controls{position:absolute;bottom:18px;left:18px;right:18px;
-display:none;justify-content:space-between;align-items:end}
-.pad{display:grid;grid-template-columns:repeat(3,52px);gap:4px}
-.pad button{height:48px;background:#152638bb}
-#fire{width:82px;height:82px;border-radius:50%;
-background:#a62e31dd}
-#hint{position:absolute;bottom:8px;left:0;right:0;
-text-align:center;font-size:11px;color:#d6e1e9}
-@media(orientation:portrait){
- #menu:after{content:"Tourne ton téléphone à l’horizontale ↻";
- position:absolute;bottom:12px;left:5%;right:5%;
- text-align:center;background:#162a3b;padding:12px;border-radius:8px}
-}
-@media(max-width:600px){#items{grid-template-columns:repeat(2,1fr)}
-.panel{padding:14px}.content{width:94vw}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VEN8 — Fortnite esports talent representation agency.">
+  <title>VEN8 | Esports Talent Agency</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div id="game"></div>
-<div id="ui">
- <div id="menu">
-  <div class="content panel">
-   <p>JEU DE TIR • UNIVERS 3D</p>
-   <h1>STRIKE <span>ZONE</span></h1>
-   <p>Combattez dans des environnements urbains
-   et personnalisez votre équipement.</p>
-   <div class="buttons">
-    <button onclick="startGame()">▶ JOUER</button>
-    <button onclick="openCatalog('armes')">⚙ ARSENAL</button>
-    <button onclick="openCatalog('skins')">◈ CAMOUFLAGES</button>
-    <button onclick="openCatalog('maps')">▦ CARTES</button>
-   </div>
-   <p id="status">3D • Mode paysage • 50 cartes</p>
-  </div>
- </div>
- <div id="top">
-  <button onclick="backMenu()">☰ MENU</button>
-  <b id="weaponLabel">ARME 01</b>
-  <button onclick="openCatalog('armes')">ARSENAL</button>
- </div>
- <div id="catalog" class="panel">
-  <button onclick="closeCatalog()">← RETOUR</button>
-  <h2 id="catTitle">ARSENAL</h2>
-  <p id="catInfo">Sélectionne un élément.</p>
-  <div id="items"></div>
- </div>
- <div id="cross" style="display:none">+</div>
- <div id="controls">
-  <div class="pad">
-   <span></span><button data-move="forward">▲</button><span></span>
-   <button data-move="left">◀</button>
-   <button data-move="back">▼</button>
-   <button data-move="right">▶</button>
-  </div>
-  <button id="fire">TIR</button>
- </div>
- <div id="hint"></div>
-</div>
+  <header class="navbar">
+    <a href="#home" class="logo">VEN<span>8</span><small>TALENT AGENCY</small></a>
+    <button id="menu-toggle" aria-label="Toggle menu">☰</button>
+    <nav id="nav">
+      <a href="#home">Home</a>
+      <a href="#roster">Roster</a>
+      <a href="#organizations">Organizations</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-<script>
-const $=id=>document.getElementById(id);
-const weaponTypes=[
- "Assaut","SMG","Précision","Soutien","Tactique",
- "Éclaireur","Défense","Élite","Prototype","Légendaire"
-];
-const weapons=Array.from({length:100},(_,i)=>({
- name:weaponTypes[i%10]+" "+String(i+1).padStart(2,"0"),
- id:i
-}));
-const skins=[
- "Forêt","Désert","Arctique","Urbain","Digital",
- "Pixel","Carbone","Or","Nuit","Jungle",
- "Océan","Rouge","Spectre","Neon","Hexagone",
- "Marbre","Acier","Tropical","Cendre","Émeraude"
-];
-const camos=Array.from({length:100},(_,i)=>
- skins[i%skins.length]+" "+String(i+1).padStart(2,"0"));
-const mapBases=[
-"Centre-ville","Désert","Port industriel","Base militaire",
-"Forêt dense","Montagnes","Entrepôt","Zone portuaire",
-"Quartier ancien","Complexe futuriste"
-];
-const maps=Array.from({length:50},(_,i)=>
- mapBases[i%10]+" "+(Math.floor(i/10)+1));
-let scene,camera,renderer,player,gun,started=false;
-let selectedMap=0,selectedWeapon=0,selectedSkin=0;
-let buildings=[],bullets=[],enemies=[];
-let held={},lastTime=0;
+  <main>
+    <section id="home" class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">INDEPENDENT TALENT. NEXT LEVEL.</p>
+        <h1>Talent deserves<br>a <span>team.</span></h1>
+        <p>We represent Fortnite Free Agents and connect exceptional players with their next competitive opportunity.</p>
+        <a class="button" href="#roster">Explore our roster ↗</a>
+        <a class="button secondary" href="#organizations">For organizations</a>
+      </div>
+      <div class="hero-art">
+        <div class="big-logo">V<span>8</span></div>
+        <p>FORTNITE<br><strong>FREE AGENTS</strong></p>
+        <small>VEN8 / TALENT DIVISION</small>
+      </div>
+    </section>
 
-function init(){
- scene=new THREE.Scene();
- scene.background=new THREE.Color(0x9ab5c4);
- scene.fog=new THREE.Fog(0x9ab5c4,35,150);
- camera=new THREE.PerspectiveCamera(
-  75,innerWidth/innerHeight,.1,300);
- renderer=new THREE.WebGLRenderer({antialias:true});
- renderer.setPixelRatio(Math.min(devicePixelRatio,2));
- renderer.setSize(innerWidth,innerHeight);
- renderer.shadowMap.enabled=true;
- renderer.shadowMap.type=THREE.PCFSoftShadowMap;
- $("game").appendChild(renderer.domElement);
- scene.add(new THREE.HemisphereLight(0xc6e4ff,0x444738,2));
- const sun=new THREE.DirectionalLight(0xffedce,2.4);
- sun.position.set(25,40,20);
- sun.castShadow=true;
- scene.add(sun);
- buildMap();
- player=new THREE.Group();
- player.position.set(0,1.7,12);
- scene.add(player);
- camera.position.set(0,0,0);
- player.add(camera);
- camera.rotation.order="YXZ";
- const g=new THREE.Group();
- const body=new THREE.Mesh(
-  new THREE.BoxGeometry(.22,.18,.75),
-  new THREE.MeshStandardMaterial({color:0x283b42}));
- body.position.set(.32,-.25,-.55);
- g.add(body);
- const barrel=new THREE.Mesh(
-  new THREE.CylinderGeometry(.035,.045,.65,8),
-  new THREE.MeshStandardMaterial({color:0x687985,metalness:.7}));
- barrel.rotation.x=Math.PI/2;
- barrel.position.set(.32,-.22,-1.05);
- g.add(barrel);
- camera.add(g);gun=g;
- window.addEventListener("resize",resize);
- window.addEventListener("keydown",e=>held[e.key.toLowerCase()]=true);
- window.addEventListener("keyup",e=>held[e.key.toLowerCase()]=false);
- renderer.domElement.addEventListener("click",()=>{
-  if(started&&$("catalog").style.display==="none")shoot();
- });
- renderer.domElement.addEventListener("pointermove",e=>{
-  if(!started||e.buttons!==2)return;
-  player.rotation.y-=e.movementX*.003;
-  camera.rotation.x-=e.movementY*.003;
-  camera.rotation.x=Math.max(-1.3,Math.min(1.3,camera.rotation.x));
- });
- renderer.domElement.addEventListener("contextmenu",e=>e.preventDefault());
- setupTouch();
- animate();
-}
-function material(color){
- return new THREE.MeshStandardMaterial({
-  color,roughness:.83,metalness:.08
- });
-}
-function addBox(x,y,z,w,h,d,color){
- const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material(color));
- m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;
- scene.add(m);buildings.push(m);return m;
-}
-function clearMap(){
- for(const b of buildings)scene.remove(b);
- buildings=[];
-}
-function buildMap(){
- clearMap();
- const ground=new THREE.Mesh(
-  new THREE.PlaneGeometry(180,180),
-  material(0x777d70));
- ground.rotation.x=-Math.PI/2;
- ground.position.y=-.06;ground.receiveShadow=true;scene.add(ground);
- const road=addBox(0,.01,0,14,.04,150,0x343a3e);
- // Procedurally arranged buildings with doors and windows.
- let seed=selectedMap+123;
- const rand=()=>{seed=(seed*1664525+1013904223)>>>0;
- return seed/4294967296};
- for(let i=0;i<64;i++){
-  let x=(rand()-.5)*90,z=(rand()-.5)*100;
-  if(Math.abs(x)<11) x+=(x<0?-12:12);
-  if(Math.abs(z)<8&&Math.abs(x)<20)z+=18;
-  const w=4+rand()*8,h=4+rand()*17,d=5+rand()*8;
-  const palette=[0x747b82,0x9a8e7b,0x515f69,0xb1a28c,0x596b62];
-  addBox(x,h/2,z,w,h,d,palette[Math.floor(rand()*palette.length)]);
-  // Visible facade windows
-  const rows=Math.max(1,Math.floor(h/2.4));
-  const cols=Math.max(1,Math.floor(w/1.7));
-  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
-   const wx=x-w/2+(c+.5)*w/cols;
-   const wy=1.3+r*2;
-   const wz=z-d/2-.026;
-   if(wy<h-.3){
-    const win=new THREE.Mesh(
-     new THREE.BoxGeometry(.65,.85,.06),
-     material(rand()>.45?0x8bc1cb:0x273947));
-    win.position.set(wx,wy,wz);scene.add(win);buildings.push(win);
-   }
-  }
- }
- // Cover objects and crates
- for(let i=0;i<28;i++){
-  const x=(rand()-.5)*55,z=(rand()-.5)*65;
-  if(Math.abs(x)<9)continue;
-  addBox(x,.65,z,2.2,1.3,2,rand()>.5?0x536c59:0x8a704f);
- }
- // Simple target dummies
- for(let i=0;i<7;i++){
-  const target=new THREE.Group();
-  const torso=new THREE.Mesh(new THREE.BoxGeometry(.8,1.1,.45),material(0x963e35));
-  torso.position.y=1.1;target.add(torso);
-  const head=new THREE.Mesh(new THREE.SphereGeometry(.27,10,8),material(0xc5a17d));
-  head.position.y=1.9;target.add(head);
-  target.position.set((i-3)*5,0,-18-Math.random()*15);
-  scene.add(target);enemies.push(target);
- }
-}
-function resize(){
- camera.aspect=innerWidth/innerHeight;
- camera.updateProjectionMatrix();
- renderer.setSize(innerWidth,innerHeight);
-}
-function startGame(){
- $("menu").style.display="none";
- $("top").style.display="flex";
- $("cross").style.display="block";
- $("controls").style.display="flex";
- $("hint").textContent="ZQSD / WASD pour bouger • clic pour tirer • clic droit + souris pour regarder";
- started=true;
-}
-function backMenu(){
- started=false;
- $("menu").style.display="flex";$("top").style.display="none";
- $("controls").style.display="none";$("cross").style.display="none";
- $("hint").textContent="";
- closeCatalog();
-}
-function openCatalog(type){
- const titles={armes:"ARSENAL — 100 ARMES",
- skins:"CAMOUFLAGES — 100 MOTIFS",maps:"CARTES — 50 ENVIRONNEMENTS"};
- $("catTitle").textContent=titles[type];
- $("catInfo").textContent=type==="armes"?
- "Choisis ton équipement.":
- type==="skins"?"Choisis l'apparence de ton arme.":
- "Choisis un environnement 3D.";
- const list=type==="armes"?weapons.map(w=>w.name):
- type==="skins"?camos:maps;
- $("items").innerHTML="";
- list.forEach((name,i)=>{
-  const b=document.createElement("button");
-  b.textContent=String(i+1).padStart(2,"0")+" · "+name;
-  b.onclick=()=>{
-   if(type==="armes"){
-    selectedWeapon=i;$("weaponLabel").textContent=name;
-    gun.children.forEach(o=>{
-     if(o.material)o.material.color.setHex(
-      [0x283b42,0x45513a,0x777777,0x8b6d43][i%4]);
-    });
-   }else if(type==="skins"){
-    selectedSkin=i;
-    gun.children.forEach(o=>{
-     if(o.material)o.material.color.setHSL((i%100)/100,.6,.45);
-    });
-   }else{
-    selectedMap=i;buildMap();
-    player.position.set(0,1.7,12);
-   }
-   $("catInfo").textContent="Sélectionné : "+name;
-  };
-  $("items").appendChild(b);
- });
- $("catalog").style.display="block";
-}
-function closeCatalog(){$("catalog").style.display="none"}
-function shoot(){
- const dir=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);
- const mesh=new THREE.Mesh(new THREE.SphereGeometry(.07,6,6),
- material(0xffd37a));
- mesh.position.copy(camera.getWorldPosition(new THREE.Vector3()));
- scene.add(mesh);bullets.push({mesh,dir,life:1.5});
-}
-function setupTouch(){
- document.querySelectorAll("[data-move]").forEach(btn=>{
-  const k=btn.dataset.move;
-  const on=()=>held["touch_"+k]=true;
-  const off=()=>held["touch_"+k]=false;
-  btn.addEventListener("pointerdown",e=>{e.preventDefault();on()});
-  ["pointerup","pointercancel","pointerleave"].forEach(ev=>
-   btn.addEventListener(ev,off));
- });
- $("fire").addEventListener("pointerdown",e=>{e.preventDefault();shoot()});
- let lastX=0,lastY=0;
- renderer.domElement.addEventListener("touchstart",e=>{
-  if(e.touches.length){lastX=e.touches[0].clientX;lastY=e.touches[0].clientY}
- },{passive:true});
- renderer.domElement.addEventListener("touchmove",e=>{
-  if(!started||$("catalog").style.display!=="none")return;
-  const t=e.touches[0],dx=t.clientX-lastX,dy=t.clientY-lastY;
-  if(t.clientX>innerWidth*.35){
-   player.rotation.y-=dx*.006;
-   camera.rotation.x=Math.max(-1.2,Math.min(1.2,camera.rotation.x-dy*.004));
-  }
-  lastX=t.clientX;lastY=t.clientY;
- },{passive:true});
-}
-function animate(time=0){
- requestAnimationFrame(animate);
- const dt=Math.min((time-lastTime)/1000,.04);lastTime=time;
- if(started&&$("catalog").style.display==="none"){
-  const speed=9*dt;
-  const forward=new THREE.Vector3(0,0,-1).applyAxisAngle(
-   new THREE.Vector3(0,1,0),player.rotation.y);
-  const right=new THREE.Vector3(1,0,0).applyAxisAngle(
-   new THREE.Vector3(0,1,0),player.rotation.y);
-  if(held.w||held.z||held.touch_forward)player.position.addScaledVector(forward,speed);
-  if(held.s||held.touch_back)player.position.addScaledVector(forward,-speed);
-  if(held.a||held.q||held.touch_left)player.position.addScaledVector(right,-speed);
-  if(held.d||held.touch_right)player.position.addScaledVector(right,speed);
- }
- bullets=bullets.filter(b=>{
-  b.mesh.position.addScaledVector(b.dir,35*(1/60));
-  b.life-=1/60;
-  if(b.life<=0){scene.remove(b.mesh);return false}return true;
- });
- renderer.render(scene,camera);
-}
-init();
-</script>
+    <section class="stats">
+      <div><strong>01</strong><span>Game focus</span><small>FORTNITE</small></div>
+      <div><strong>100%</strong><span>Player-first</span><small>OUR APPROACH</small></div>
+      <div><strong>∞</strong><span>Potential</span><small>WHAT'S NEXT</small></div>
+    </section>
+
+    <section id="roster" class="section">
+      <p class="eyebrow">MEET THE TALENT</p>
+      <h2>Our <span>roster.</span></h2>
+      <p class="muted">Explore our Fortnite talent. All profiles below are fictional examples.</p>
+      <div class="filters">
+        <input id="search" type="search" placeholder="Search players..." aria-label="Search players">
+        <select id="region-filter" aria-label="Filter by region">
+          <option value="">All regions</option>
+          <option value="Europe">Europe</option>
+          <option value="NA East">NA East</option>
+          <option value="NA West">NA West</option>
+        </select>
+      </div>
+      <div id="player-grid" class="player-grid"></div>
+      <p class="demo-note">DEMO ROSTER — All player identities and details are fictional.</p>
+    </section>
+
+    <section id="player-profile" class="section hidden">
+      <button id="back-button" class="button secondary">← Back to roster</button>
+      <div id="profile-content"></div>
+    </section>
+
+    <section id="organizations" class="section dark-section">
+      <p class="eyebrow">FOR ORGANIZATIONS</p>
+      <h2>Find your next <span>competitive edge.</span></h2>
+      <div class="feature-grid">
+        <article><h3>01 / Discovery</h3><p>Discover players by region, role and playstyle.</p></article>
+        <article><h3>02 / Connection</h3><p>Start a conversation with talent that fits your roster.</p></article>
+        <article><h3>03 / Representation</h3><p>Build stronger partnerships through clear communication.</p></article>
+      </div>
+      <a href="#contact" class="button">Talk to VEN8 ↗</a>
+    </section>
+
+    <section id="about" class="section">
+      <p class="eyebrow">WHO WE ARE</p>
+      <h2>Talent first.<br><span>Always.</span></h2>
+      <p class="muted">VEN8 is a concept esports agency focused on representing Fortnite Free Agents and helping players find meaningful competitive opportunities.</p>
+      <div class="principles">
+        <p><strong>01 — Player-first</strong><br>Players' goals come first.</p>
+        <p><strong>02 — Transparent</strong><br>Clear communication at every step.</p>
+        <p><strong>03 — Opportunity-led</strong><br>Better connections. Stronger teams.</p>
+      </div>
+    </section>
+
+    <section id="contact" class="section dark-section">
+      <p class="eyebrow">LET'S TALK</p>
+      <h2>Make the next <span>move.</span></h2>
+      <p class="muted">Looking for a player or seeking representation? Send us a message.</p>
+      <form id="contact-form">
+        <label>Your name<input name="name" required placeholder="Name or organization"></label>
+        <label>Your email<input name="email" type="email" required placeholder="you@example.com"></label>
+        <label>I'm contacting you as
+          <select name="type">
+            <option>Organization / team</option>
+            <option>Player seeking representation</option>
+            <option>Other</option>
+          </select>
+        </label>
+        <label>Message<textarea name="message" required rows="5" placeholder="Tell us about your project..."></textarea></label>
+        <button class="button" type="submit">Prepare email ↗</button>
+        <p id="form-status" class="demo-note">Demo form. Messages are not stored by this website.</p>
+      </form>
+    </section>
+
+    <section id="admin" class="section">
+      <p class="eyebrow">LOCAL DEMO ONLY</p>
+      <h2>Roster <span>manager.</span></h2>
+      <p class="demo-note">Prototype only: this area has no login and is not secure. Changes are saved only in this browser.</p>
+      <form id="admin-form">
+        <label>Player nickname<input name="name" required placeholder="Nickname"></label>
+        <label>Region
+          <select name="region">
+            <option>Europe</option><option>NA East</option><option>NA West</option>
+          </select>
+        </label>
+        <label>Role<input name="role" required placeholder="IGL, Fragger, Flexible..."></label>
+        <label>Short bio<textarea name="bio" rows="3" placeholder="Player introduction"></textarea></label>
+        <button class="button" type="submit">Add player +</button>
+      </form>
+      <div id="admin-list"></div>
+    </section>
+  </main>
+
+  <footer>
+    <a href="#home" class="logo">VEN<span>8</span></a>
+    <p>Independent talent. Next level.</p>
+    <small>© <span id="year"></span> VEN8. Website prototype. Not affiliated with Epic Games.</small>
+  </footer>
+
+  <script src="app.js"></script>
 </body>
 </html>
+:root {
+  --bg: #090b0e;
+  --panel: #12171b;
+  --lime: #c7ff42;
+  --white: #f4f5f2;
+  --muted: #9ba5aa;
+  --border: #293138;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--white);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+span {
+  color: var(--lime);
+}
+
+.navbar {
+  min-height: 78px;
+  padding: 15px 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #090b0ef2;
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+
+.logo {
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: -2px;
+}
+
+.logo small {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+}
+
+nav {
+  display: flex;
+  gap: 25px;
+}
+
+nav a {
+  color: #c4cacc;
+  font-size: 13px;
+}
+
+nav a:hover {
+  color: var(--lime);
+}
+
+#menu-toggle {
+  display: none;
+  color: white;
+  background: transparent;
+  border: 0;
+  font-size: 24px;
+}
+
+.hero {
+  padding: 85px 8%;
+  display: grid;
+  grid-template-columns: 1fr 0.85fr;
+  gap: 45px;
+  align-items: center;
+}
+
+.eyebrow {
+  color: var(--lime);
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 2.5px;
+  margin-bottom: 20px;
+}
+
+h1, h2, h3 {
+  line-height: 1.1;
+}
+
+h1 {
+  font-size: clamp(45px, 6vw, 76px);
+  letter-spacing: -4px;
+  margin: 0 0 25px;
+}
+
+h2 {
+  font-size: clamp(34px, 4vw, 49px);
+  letter-spacing: -2px;
+  margin: 0 0 20px;
+}
+
+.hero-copy > p:not(.eyebrow) {
+  color: var(--muted);
+  max-width: 480px;
+  margin-bottom: 30px;
+}
+
+.button {
+  display: inline-block;
+  padding: 13px 19px;
+  background: var(--lime);
+  color: #10140a;
+  border: 1px solid var(--lime);
+  border-radius: 3px;
+  font-weight: bold;
+  font-size: 12px;
+  cursor: pointer;
+  margin: 4px 6px 4px 0;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  background: #dcff8a;
+}
+
+.button.secondary {
+  background: transparent;
+  border-color: #454e54;
+  color: var(--white);
+}
+
+.button.secondary:hover {
+  border-color: var(--lime);
+}
+
+.hero-art {
+  min-height: 340px;
+  padding: 25px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background:
+    linear-gradient(135deg, transparent 55%, #c7ff4219 55%),
+    repeating-linear-gradient(0deg, transparent 0 34px, #ffffff0a 35px),
+    repeating-linear-gradient(90deg, transparent 0 34px, #ffffff0a 35px),
+    #11171a;
+  border: 1px solid #39422f;
+}
+
+.big-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%) rotate(-8deg);
+  font-size: clamp(100px, 15vw, 180px);
+  font-weight: 900;
+  letter-spacing: -15px;
+}
+
+.hero-art p, .hero-art small {
+  position: relative;
+  z-index: 1;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.hero-art small {
+  color: var(--muted);
+}
+
+.stats {
+  margin: 0 6%;
+  padding: 25px 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.stats div {
+  padding: 5px 20px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.stats div:last-child {
+  border: 0;
+}
+
+.stats strong {
+  font-size: 28px;
+}
+
+.stats span, .stats small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.stats small {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  margin-top: 6px;
+}
+
+.section {
+  padding: 75px 8%;
+}
+
+.muted, .demo-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  margin: 25px 0;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  color: var(--white);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  outline-color: var(--lime);
+}
+
+.filters input {
+  flex: 1;
+}
+
+.filters select {
+  width: 180px;
+}
+
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.player-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.player-card:hover, .player-card:focus {
+  transform: translateY(-4px);
+  border-color: var(--lime);
+  outline: none;
+}
+
+.player-art {
+  height: 155px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  background: radial-gradient(ellipse, #39472a, #151a1d 70%);
+}
+
+.player-art strong {
+  font-size: 50px;
+  color: var(--lime);
+  letter-spacing: -3px;
+}
+
+.status {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  color: var(--lime);
+  background: #10160b;
+  padding: 4px 7px;
+  font-size: 9px;
+}
+
+.player-info {
+  padding: 15px;
+}
+
+.player-info h3 {
+  margin: 0;
+  font-size: 21px;
+}
+
+.player-info p {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 7px;
+  margin: 2px;
+  border: 1px solid #39433a;
+  color: #cbd2cc;
+  font-size: 9px;
+}
+
+.dark-section {
+  background: #101519;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 30px 0;
+}
+
+.feature-grid article {
+  padding: 25px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.feature-grid h3 {
+  color: var(--lime);
+  font-size: 17px;
+}
+
+.feature-grid p, .principles p {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.principles {
+  margin-top: 30px;
+  max-width: 650px;
+}
+
+.principles p {
+  padding: 15px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+form {
+  display: grid;
+  gap: 15px;
+  max-width: 600px;
+}
+
+label {
+  display: grid;
+  gap: 7px;
+  color: #d8ddda;
+  font-size: 12px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#profile-content {
+  margin-top: 30px;
+  max-width: 750px;
+}
+
+#profile-content .profile-avatar {
+  width: 100%;
+  min-height: 200px;
+  display: grid;
+  place-items: center;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  font-size: 75px;
+  color: var(--lime);
+}
+
+#admin-list {
+  max-width: 600px;
+  margin-top: 20px;
+}
+
+.admin-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.admin-row button {
+  background: transparent;
+  border: 1px solid #794747;
+  color: #ffaaaa;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+
+footer {
+  padding: 35px 8%;
+  border-top: 1px solid var(--border);
+}
+
+footer p, footer small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+@media (max-width: 900px) {
+  .player-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero {
+    gap: 25px;
+  }
+
+  nav {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 650px) {
+  .navbar {
+    min-height: 68px;
+  }
+
+  #menu-toggle {
+    display: block;
+  }
+
+  nav {
+    display: none;
+    position: absolute;
+    top: 67px;
+    left: 0;
+    right: 0;
+    padding: 15px 6%;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    flex-direction: column;
+    gap: 0;
+  }
+
+  nav.open {
+    display: flex;
+  }
+
+  nav a {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 55px 6%;
+  }
+
+  .hero-art {
+    min-height: 260px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .stats div {
+    padding: 15px 5px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section {
+    padding: 55px 6%;
+  }
+
+  .player-grid {
+    gap: 10px;
+  }
+
+  .player-art {
+    height: 120px;
+  }
+
+  .player-info {
+    padding: 10px;
+  }
+
+  .player-info h3 {
+    font-size: 17px;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .filters select {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    transition: none !important;
+  }
+}
+:root {
+  --bg: #090b0e;
+  --panel: #12171b;
+  --lime: #c7ff42;
+  --white: #f4f5f2;
+  --muted: #9ba5aa;
+  --border: #293138;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--white);
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+span {
+  color: var(--lime);
+}
+
+.navbar {
+  min-height: 78px;
+  padding: 15px 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #090b0ef2;
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+
+.logo {
+  font-size: 25px;
+  font-weight: 900;
+  letter-spacing: -2px;
+}
+
+.logo small {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+}
+
+nav {
+  display: flex;
+  gap: 25px;
+}
+
+nav a {
+  color: #c4cacc;
+  font-size: 13px;
+}
+
+nav a:hover {
+  color: var(--lime);
+}
+
+#menu-toggle {
+  display: none;
+  color: white;
+  background: transparent;
+  border: 0;
+  font-size: 24px;
+}
+
+.hero {
+  padding: 85px 8%;
+  display: grid;
+  grid-template-columns: 1fr 0.85fr;
+  gap: 45px;
+  align-items: center;
+}
+
+.eyebrow {
+  color: var(--lime);
+  font-size: 10px;
+  font-weight: bold;
+  letter-spacing: 2.5px;
+  margin-bottom: 20px;
+}
+
+h1, h2, h3 {
+  line-height: 1.1;
+}
+
+h1 {
+  font-size: clamp(45px, 6vw, 76px);
+  letter-spacing: -4px;
+  margin: 0 0 25px;
+}
+
+h2 {
+  font-size: clamp(34px, 4vw, 49px);
+  letter-spacing: -2px;
+  margin: 0 0 20px;
+}
+
+.hero-copy > p:not(.eyebrow) {
+  color: var(--muted);
+  max-width: 480px;
+  margin-bottom: 30px;
+}
+
+.button {
+  display: inline-block;
+  padding: 13px 19px;
+  background: var(--lime);
+  color: #10140a;
+  border: 1px solid var(--lime);
+  border-radius: 3px;
+  font-weight: bold;
+  font-size: 12px;
+  cursor: pointer;
+  margin: 4px 6px 4px 0;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  background: #dcff8a;
+}
+
+.button.secondary {
+  background: transparent;
+  border-color: #454e54;
+  color: var(--white);
+}
+
+.button.secondary:hover {
+  border-color: var(--lime);
+}
+
+.hero-art {
+  min-height: 340px;
+  padding: 25px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background:
+    linear-gradient(135deg, transparent 55%, #c7ff4219 55%),
+    repeating-linear-gradient(0deg, transparent 0 34px, #ffffff0a 35px),
+    repeating-linear-gradient(90deg, transparent 0 34px, #ffffff0a 35px),
+    #11171a;
+  border: 1px solid #39422f;
+}
+
+.big-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%) rotate(-8deg);
+  font-size: clamp(100px, 15vw, 180px);
+  font-weight: 900;
+  letter-spacing: -15px;
+}
+
+.hero-art p, .hero-art small {
+  position: relative;
+  z-index: 1;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.hero-art small {
+  color: var(--muted);
+}
+
+.stats {
+  margin: 0 6%;
+  padding: 25px 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.stats div {
+  padding: 5px 20px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.stats div:last-child {
+  border: 0;
+}
+
+.stats strong {
+  font-size: 28px;
+}
+
+.stats span, .stats small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.stats small {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  margin-top: 6px;
+}
+
+.section {
+  padding: 75px 8%;
+}
+
+.muted, .demo-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  margin: 25px 0;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  color: var(--white);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  outline-color: var(--lime);
+}
+
+.filters input {
+  flex: 1;
+}
+
+.filters select {
+  width: 180px;
+}
+
+.player-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.player-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.player-card:hover, .player-card:focus {
+  transform: translateY(-4px);
+  border-color: var(--lime);
+  outline: none;
+}
+
+.player-art {
+  height: 155px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  background: radial-gradient(ellipse, #39472a, #151a1d 70%);
+}
+
+.player-art strong {
+  font-size: 50px;
+  color: var(--lime);
+  letter-spacing: -3px;
+}
+
+.status {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  color: var(--lime);
+  background: #10160b;
+  padding: 4px 7px;
+  font-size: 9px;
+}
+
+.player-info {
+  padding: 15px;
+}
+
+.player-info h3 {
+  margin: 0;
+  font-size: 21px;
+}
+
+.player-info p {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 7px;
+  margin: 2px;
+  border: 1px solid #39433a;
+  color: #cbd2cc;
+  font-size: 9px;
+}
+
+.dark-section {
+  background: #101519;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin: 30px 0;
+}
+
+.feature-grid article {
+  padding: 25px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+
+.feature-grid h3 {
+  color: var(--lime);
+  font-size: 17px;
+}
+
+.feature-grid p, .principles p {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.principles {
+  margin-top: 30px;
+  max-width: 650px;
+}
+
+.principles p {
+  padding: 15px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+form {
+  display: grid;
+  gap: 15px;
+  max-width: 600px;
+}
+
+label {
+  display: grid;
+  gap: 7px;
+  color: #d8ddda;
+  font-size: 12px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.hidden {
+  display: none !important;
+}
+
+#profile-content {
+  margin-top: 30px;
+  max-width: 750px;
+}
+
+#profile-content .profile-avatar {
+  width: 100%;
+  min-height: 200px;
+  display: grid;
+  place-items: center;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  font-size: 75px;
+  color: var(--lime);
+}
+
+#admin-list {
+  max-width: 600px;
+  margin-top: 20px;
+}
+
+.admin-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+.admin-row button {
+  background: transparent;
+  border: 1px solid #794747;
+  color: #ffaaaa;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+
+footer {
+  padding: 35px 8%;
+  border-top: 1px solid var(--border);
+}
+
+footer p, footer small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+@media (max-width: 900px) {
+  .player-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero {
+    gap: 25px;
+  }
+
+  nav {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 650px) {
+  .navbar {
+    min-height: 68px;
+  }
+
+  #menu-toggle {
+    display: block;
+  }
+
+  nav {
+    display: none;
+    position: absolute;
+    top: 67px;
+    left: 0;
+    right: 0;
+    padding: 15px 6%;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    flex-direction: column;
+    gap: 0;
+  }
+
+  nav.open {
+    display: flex;
+  }
+
+  nav a {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 55px 6%;
+  }
+
+  .hero-art {
+    min-height: 260px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr;
+  }
+
+  .stats div {
+    padding: 15px 5px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section {
+    padding: 55px 6%;
+  }
+
+  .player-grid {
+    gap: 10px;
+  }
+
+  .player-art {
+    height: 120px;
+  }
+
+  .player-info {
+    padding: 10px;
+  }
+
+  .player-info h3 {
+    font-size: 17px;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .filters select {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *, *::before, *::after {
+    transition: none !important;
+  }
+}
+const demoPlayers = [
+  {
+    id: "zyro",
+    name: "Zyro",
+    region: "Europe",
+    role: "IGL",
+    style: "Strategic",
+    initials: "ZY",
+    bio: "Fictional in-game leader focused on strategy, communication and endgame decisions.",
+    languages: "French / English"
+  },
+  {
+    id: "kaizo",
+    name: "Kaizo",
+    region: "NA East",
+    role: "Fragger",
+    style: "Aggressive",
+    initials: "KZ",
+    bio: "Fictional aggressive player focused on mechanics, smart fights and team play.",
+    languages: "English"
+  },
+  {
+    id: "lynx",
+    name: "Lynx",
+    region: "Europe",
+    role: "Flexible",
+    style: "Endgame",
+    initials: "LX",
+    bio: "Fictional versatile competitor focused on rotations and consistency.",
+    languages: "English"
+  },
+  {
+    id: "vexx",
+    name: "Vexx",
+    region: "NA West",
+    role: "Fragger",
+    style: "Mechanical",
+    initials: "VX",
+    bio: "Fictional talent focused on creating space and supporting team fights.",
+    languages: "English"
+  }
+];
+
+const STORAGE_KEY = "ven8-demo-roster";
+let players = loadPlayers();
+
+const $ = (selector) => document.querySelector(selector);
+
+function loadPlayers() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : demoPlayers;
+  } catch {
+    return demoPlayers;
+  }
+}
+
+function savePlayers() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(players));
+  } catch {
+    console.warn("Roster could not be saved in this browser.");
+  }
+}
+
+function escapeHTML(value = "") {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function playerCard(player) {
+  return `
+    <article class="player-card" tabindex="0"
+      role="link" data-profile="${escapeHTML(player.id)}"
+      aria-label="View ${escapeHTML(player.name)} profile">
+      <div class="player-art">
+        <strong>${escapeHTML(player.initials || player.name.slice(0, 2).toUpperCase())}</strong>
+        <span class="status">● DEMO FREE AGENT</span>
+      </div>
+      <div class="player-info">
+        <h3>${escapeHTML(player.name)}</h3>
+        <p>${escapeHTML(player.role)} · Fortnite</p>
+        <span class="tag">${escapeHTML(player.region)}</span>
+        <span class="tag">${escapeHTML(player.style)}</span>
+        <p>${escapeHTML(player.languages || "Languages not specified")}</p>
+      </div>
+    </article>`;
+}
+
+function renderRoster() {
+  const query = ($("#search").value || "").toLowerCase().trim();
+  const region = $("#region-filter").value;
+
+  const filtered = players.filter(player => {
+    const searchable = [
+      player.name,
+      player.region,
+      player.role,
+      player.style,
+      player.bio
+    ].join(" ").toLowerCase();
+
+    return searchable.includes(query) &&
+      (!region || player.region === region);
+  });
+
+  $("#player-grid").innerHTML = filtered.length
+    ? filtered.map(playerCard).join("")
+    : '<p class="muted">No players found. Try another search.</p>';
+}
+
+function openProfile(id) {
+  const player = players.find(item => item.id === id);
+  if (!player) return;
+
+  $("#roster").classList.add("hidden");
+  $("#player-profile").classList.remove("hidden");
+
+  $("#profile-content").innerHTML = `
+    <div class="profile-avatar">
+      ${escapeHTML(player.initials || player.name.slice(0, 2).toUpperCase())}
+    </div>
+    <p class="eyebrow">VEN8 / PLAYER PROFILE / DEMO</p>
+    <h2>${escapeHTML(player.name)} <span>↗</span></h2>
+    <p class="muted">Fortnite · ${escapeHTML(player.region)}</p>
+    <span class="tag">${escapeHTML(player.role)}</span>
+    <span class="tag">${escapeHTML(player.style)}</span>
+    <h3>About the player</h3>
+    <p class="muted">${escapeHTML(player.bio || "Demo profile. Bio not provided.")}</p>
+    <p><strong>Languages:</strong> ${escapeHTML(player.languages || "Not specified")}</p>
+    <p class="demo-note">
+      Fictional profile for demonstration only. Competitive history and
+      availability must be verified before publication.
+    </p>
+    <a class="button" href="#contact">Enquire about this player ↗</a>
+  `;
+
+  window.location.hash = "player-profile";
+  $("#player-profile").scrollIntoView();
+}
+
+function showRoster() {
+  $("#player-profile").classList.add("hidden");
+  $("#roster").classList.remove("hidden");
+  renderRoster();
+}
+
+function renderAdmin() {
+  $("#admin-list").innerHTML = players.map(player => `
+    <div class="admin-row">
+      <span>
+        <strong>${escapeHTML(player.name)}</strong><br>
+        <small>${escapeHTML(player.region)} · ${escapeHTML(player.role)}</small>
+      </span>
+      <button type="button" data-delete="${escapeHTML(player.id)}">
+        Remove
+      </button>
+    </div>
+  `).join("") || '<p class="muted">No players yet.</p>';
+}
+
+// Mobile navigation
+$("#menu-toggle").addEventListener("click", () => {
+  $("#nav").classList.toggle("open");
+});
+
+$("#nav").addEventListener("click", event => {
+  if (event.target.closest("a")) {
+    $("#nav").classList.remove("open");
+  }
+});
+
+// Search and region filter
+$("#search").addEventListener("input", renderRoster);
+$("#region-filter").addEventListener("change", renderRoster);
+
+// Open a profile when a player card is selected
+$("#player-grid").addEventListener("click", event => {
+  const card = event.target.closest("[data-profile]");
+  if (card) openProfile(card.dataset.profile);
+});
+
+$("#player-grid").addEventListener("keydown", event => {
+  if (event.key === "Enter" || event.key === " ") {
+    const card = event.target.closest("[data-profile]");
+    if (card) {
+      event.preventDefault();
+      openProfile(card.dataset.profile);
+    }
+  }
+});
+
+$("#back-button").addEventListener("click", showRoster);
+
+// Contact form: prepares an email, but does not send it automatically
+$("#contact-form").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const data = new FormData(event.currentTarget);
+  const name = data.get("name");
+  const email = data.get("email");
+  const type = data.get("type");
+  const message = data.get("message");
+
+  // Replace this placeholder with your verified agency email.
+  const agencyEmail = "contact@your-domain.com";
+
+  const subject = encodeURIComponent(`VEN8 enquiry — ${type}`);
+  const body = encodeURIComponent(
+    `Name: ${name}\nEmail: ${email}\nType: ${type}\n\n${message}`
+  );
+
+  $("#form-status").textContent =
+    "Your email app should open. Review the message and send it yourself.";
+
+  window.location.href =
+    `mailto:${agencyEmail}?subject=${subject}&body=${body}`;
+});
+
+// Demo administration: add a player
+$("#admin-form").addEventListener("submit", event => {
+  event.preventDefault();
+
+  const data = new FormData(event.currentTarget);
+  const name = String(data.get("name")).trim();
+
+  const player = {
+    id: "player-" + Date.now(),
+    name,
+    region: data.get("region"),
+    role: String(data.get("role")).trim(),
+    style: "Flexible",
+    initials: name.slice(0, 2).toUpperCase(),
+    bio: String(data.get("bio")).trim() || "Demo player profile.",
+    languages: "Not specified"
+  };
+
+  players.push(player);
+  savePlayers();
+  renderRoster();
+  renderAdmin();
+  event.currentTarget.reset();
+});
+
+// Demo administration: remove a player
+$("#admin-list").addEventListener("click", event => {
+  const button = event.target.closest("[data-delete]");
+  if (!button) return;
+
+  const id = button.dataset.delete;
+  players = players.filter(player => player.id !== id);
+
+  savePlayers();
+  renderRoster();
+  renderAdmin();
+});
+
+// Initialize the website
+$("#year").textContent = new Date().getFullYear();
+
+renderRoster();
+renderAdmin();
+      
