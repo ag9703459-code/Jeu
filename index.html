@@ -1,0 +1,366 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>STRIKE ZONE | Menu principal</title>
+<style>
+:root {
+  --bg:#080d15;--panel:#111c2a;--line:#293c50;
+  --red:#ff563d;--text:#f4f7fc;--muted:#9cacc0;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+font-family:Arial,sans-serif}
+button,input,select{font:inherit}
+button,select,input[type=text]{
+background:#19283a;color:white;border:1px solid var(--line);
+padding:11px;border-radius:5px}
+button{cursor:pointer;transition:.15s}
+button:hover,.active{background:var(--red);color:white}
+header{height:75px;display:flex;align-items:center;
+justify-content:space-between;padding:0 5%;
+border-bottom:1px solid var(--line);background:#0b121e}
+.logo{font-size:24px;font-weight:900;letter-spacing:3px}
+.logo span{color:var(--red)}
+.status{color:#91e4b2;font-size:12px}
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 75px)}
+aside{padding:20px 12px;border-right:1px solid var(--line);
+background:#0b121e}
+.nav{display:block;width:100%;text-align:left;margin-bottom:8px;
+background:transparent;border-color:transparent}
+.nav.active{background:#301e25;border-color:#74372e}
+.nav b{margin-right:10px}
+main{padding:24px;max-width:1400px;width:100%;margin:auto}
+.hero{min-height:220px;padding:30px;display:flex;align-items:center;
+background:linear-gradient(110deg,#182b40,#131e2c 60%,#46251f);
+border:1px solid #39485a;border-radius:10px;position:relative;overflow:hidden}
+.hero:after{content:"SZ";position:absolute;right:35px;top:15px;
+font-size:130px;font-weight:900;color:#ffffff09}
+.hero h1{font-size:clamp(32px,5vw,56px);margin:10px 0}
+.hero p{color:#c0ccdb}
+.tag{font-size:11px;color:var(--red);letter-spacing:3px;font-weight:bold}
+.primary{background:var(--red);border:0;font-weight:bold;padding:14px 22px}
+.secondary{margin-left:8px}
+h2{font-size:19px}
+h3{margin-top:0}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);
+border-radius:8px;padding:16px;min-width:0}
+.card p,.muted,small{color:var(--muted)}
+.card button{width:100%;margin-top:8px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1}
+label{display:block;margin:15px 0;color:#c4d0df}
+label input:not([type=checkbox]),label select{
+display:block;width:100%;margin-top:7px}
+input[type=range]{width:100%;accent-color:var(--red)}
+input[type=checkbox]{accent-color:var(--red)}
+.section{display:none}
+.section.active{display:block}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:9px}
+.item{background:var(--panel);padding:12px;border:1px solid var(--line);border-radius:6px}
+.item small{display:block;margin-top:5px}
+#arena{height:330px;position:relative;overflow:hidden;
+background:linear-gradient(#172b40 0%,#344553 62%,#19241e 63%);
+border:2px solid #3a5266;border-radius:8px;margin:15px 0}
+#player{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:32px}
+.enemy{position:absolute;cursor:pointer;font-size:27px}
+footer{padding:20px;text-align:center;color:var(--muted);font-size:12px}
+@media(max-width:700px){
+.layout{grid-template-columns:1fr}
+aside{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;
+border-right:0;border-bottom:1px solid var(--line);padding:8px}
+.nav{text-align:center;font-size:12px;padding:9px 3px;margin:0}
+main{padding:12px}.hero{padding:20px}.hero:after{right:5px;font-size:80px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">STRIKE <span>ZONE</span></div>
+  <div class="status">● PROTOTYPE LOCAL</div>
+</header>
+
+<div class="layout">
+<aside>
+<button class="nav active" data-page="home"><b>⌂</b> Accueil</button>
+<button class="nav" data-page="play"><b>⚔</b> Jouer</button>
+<button class="nav" data-page="maps"><b>▦</b> Maps (70)</button>
+<button class="nav" data-page="weapons"><b>⌁</b> Arsenal (150)</button>
+<button class="nav" data-page="loadout"><b>▣</b> Équipement</button>
+<button class="nav" data-page="operator"><b>♙</b> Personnage</button>
+<button class="nav" data-page="settings"><b>⚙</b> Paramètres</button>
+<button class="nav" data-page="profile"><b>★</b> Profil & stats</button>
+</aside>
+
+<main>
+<section id="home" class="section active">
+  <div class="hero">
+    <div>
+      <div class="tag">SAISON 01 · COMBAT TACTIQUE</div>
+      <h1>PRÊT AU COMBAT ?</h1>
+      <p>Choisis ton terrain. Prépare ton arsenal. Entre dans la bataille.</p>
+      <button class="primary" onclick="go('play')">▶ JOUER</button>
+      <button class="secondary" onclick="go('loadout')">ÉQUIPEMENT</button>
+    </div>
+  </div>
+  <h2>ACCÈS RAPIDE</h2>
+  <div class="cards">
+    <div class="card"><h3>⚔ Battle Royale</h3><p>Survis et sois le dernier debout.</p><button onclick="quick('Battle Royale')">Sélectionner</button></div>
+    <div class="card"><h3>🎯 Match à mort</h3><p>Accumule des éliminations.</p><button onclick="quick('Match à mort')">Sélectionner</button></div>
+    <div class="card"><h3>🛡 Survie</h3><p>Affronte des vagues d'adversaires.</p><button onclick="quick('Survie')">Sélectionner</button></div>
+    <div class="card"><h3>♧ Entraînement</h3><p>Teste ton arme dans l'arène.</p><button onclick="quick('Entraînement')">Sélectionner</button></div>
+  </div>
+  <h2>TON PROFIL</h2>
+  <div class="cards">
+    <div class="card">Niveau <h2 id="level">1</h2></div>
+    <div class="card">Éliminations <h2 id="totalKills">0</h2></div>
+    <div class="card">Parties jouées <h2 id="totalGames">0</h2></div>
+    <div class="card">Maps disponibles <h2>70</h2></div>
+  </div>
+</section>
+
+<section id="play" class="section">
+  <h2>CONFIGURATION DE PARTIE</h2>
+  <div class="card">
+    <label>Mode de jeu<select id="mode">
+      <option>Battle Royale</option><option>Match à mort</option>
+      <option>Survie</option><option>Entraînement</option>
+      <option>Partie personnalisée</option>
+    </select></label>
+    <label>Carte<select id="mapSelect"></select></label>
+    <label>Arme principale<select id="weaponSelect"></select></label>
+    <label>Difficulté des bots<select id="difficulty">
+      <option>Facile</option><option selected>Normale</option><option>Difficile</option>
+    </select></label>
+    <label>Nombre de bots<select id="botCount">
+      <option>3</option><option selected>5</option><option>10</option><option>20</option>
+    </select></label>
+    <button class="primary" onclick="startGame()">LANCER LA PARTIE</button>
+  </div>
+  <div id="game" class="card" style="display:none;margin-top:15px">
+    <div class="cards">
+      <div class="item">❤️ Vie : <b id="hp">100</b></div>
+      <div class="item">🎯 Éliminations : <b id="kills">0</b></div>
+      <div class="item">🔫 Munitions : <b id="ammo">30</b></div>
+    </div>
+    <p id="feed">Clique sur un adversaire pour tirer.</p>
+    <div id="arena"><div id="player">🪖</div></div>
+    <button onclick="reload()">Recharger</button>
+    <button onclick="heal()">Soin</button>
+    <button onclick="endGame()">Quitter</button>
+  </div>
+</section>
+
+<section id="maps" class="section">
+  <h2>CHOISIR UNE CARTE</h2>
+  <input id="mapSearch" type="text" placeholder="Rechercher une carte..." oninput="renderMaps()" style="width:100%">
+  <p class="muted">70 cartes fictives générées pour le prototype.</p>
+  <div id="mapGrid" class="list"></div>
+</section>
+
+<section id="weapons" class="section">
+  <h2>ARSENAL</h2>
+  <input id="weaponSearch" type="text" placeholder="Rechercher une arme..." oninput="renderWeapons()" style="width:100%">
+  <div class="row">
+    <label>Catégorie<select id="weaponFilter" onchange="renderWeapons()"><option>Toutes</option><option>Fusil d'assaut</option><option>Mitraillette</option><option>Fusil de précision</option><option>Fusil à pompe</option><option>Mitrailleuse</option><option>Pistolet</option><option>Arme énergétique</option><option>Fusil tactique</option><option>Carabine</option><option>Arme expérimentale</option></select></label>
+  </div>
+  <div id="weaponGrid" class="list"></div>
+</section>
+
+<section id="loadout" class="section">
+  <h2>ÉQUIPEMENT</h2>
+  <div class="cards">
+    <div class="card"><h3>Emplacement 1</h3><label>Arme principale<select id="slot1"></select></label></div>
+    <div class="card"><h3>Emplacement 2</h3><label>Arme secondaire<select id="slot2"></select></label></div>
+    <div class="card"><h3>Emplacement 3</h3><label>Équipement tactique<select id="tactical"><option>Grenade fumigène</option><option>Grenade flash fictive</option><option>Balise de reconnaissance</option><option>Kit de soin</option></select></label></div>
+    <div class="card"><h3>Emplacement 4</h3><label>Protection<select id="armor"><option>Aucune</option><option>Armure légère</option><option>Armure renforcée</option><option>Armure lourde</option></select></label></div>
+  </div>
+  <button class="primary" onclick="saveLoadout()">ENREGISTRER L'ÉQUIPEMENT</button>
+  <p id="loadoutMsg"></p>
+</section>
+
+<section id="operator" class="section">
+  <h2>PERSONNALISATION DU PERSONNAGE</h2>
+  <div class="cards">
+    <div class="card"><h3>Apparence</h3><label>Opérateur<select id="skin"><option>Assaut</option><option>Reconnaissance</option><option>Ingénieur</option><option>Éclaireur</option></select></label><label>Couleur<select id="skinColor"><option>Bleu</option><option>Rouge</option><option>Vert</option><option>Noir</option></select></label></div>
+    <div class="card"><h3>Style de jeu</h3><label>Spécialité<select id="specialty"><option>Assaut</option><option>Défense</option><option>Soutien</option><option>Reconnaissance</option></select></label><p class="muted">Ces choix sont visuels dans cette version.</p></div>
+  </div>
+  <button onclick="saveOperator()">APPLIQUER</button><p id="operatorMsg"></p>
+</section>
+
+<section id="settings" class="section">
+  <h2>PARAMÈTRES COMPLETS</h2>
+  <div class="cards">
+    <div class="card"><h3>Vidéo</h3>
+      <label>Qualité<select id="graphics"><option>Faible</option><option selected>Moyenne</option><option>Élevée</option><option>Ultra</option></select></label>
+      <label>Résolution<select id="resolution"><option>Automatique</option><option>1280 × 720</option><option>1920 × 1080</option><option>2560 × 1440</option></select></label>
+      <label>FPS maximum<select id="fps"><option>30</option><option>60</option><option>120</option><option>144</option><option>Illimité</option></select></label>
+      <label><input type="checkbox" id="shadows" checked> Ombres</label>
+      <label><input type="checkbox" id="effects" checked> Effets visuels</label>
+      <label><input type="checkbox" id="fullscreen"> Plein écran</label>
+    </div>
+    <div class="card"><h3>Commandes</h3>
+      <label>Sensibilité souris <input id="sensitivity" type="range" min="1" max="100" value="50"></label>
+      <label>Champ de vision (FOV) <input id="fov" type="range" min="60" max="120" value="90"></label>
+      <label>Inverser l'axe vertical <input type="checkbox" id="invertY"></label>
+      <label>Visée automatique <input type="checkbox" id="aimAssist"></label>
+      <label>Afficher le viseur <input type="checkbox" id="crosshair" checked></label>
+    </div>
+    <div class="card"><h3>Audio</h3>
+      <label>Volume général <input id="volume" type="range" min="0" max="100" value="70"></label>
+      <label>Effets sonores <input id="sfx" type="range" min="0" max="100" value="80"></label>
+      <label>Musique <input id="music" type="range" min="0" max="100" value="35"></label>
+      <label><input type="checkbox" id="mute"> Mode silencieux</label>
+    </div>
+    <div class="card"><h3>Interface</h3>
+      <label>Taille du HUD <input id="hud" type="range" min="50" max="150" value="100"></label>
+      <label>Langue<select id="language"><option>Français</option><option>English</option><option>Español</option></select></label>
+      <label>Couleur de l'interface<select id="uiColor"><option>Rouge</option><option>Bleu</option><option>Vert</option></select></label>
+      <label><input type="checkbox" id="damageNumbers" checked> Afficher les dégâts</label>
+    </div>
+  </div>
+  <button class="primary" onclick="saveSettings()">APPLIQUER ET SAUVEGARDER</button>
+  <button onclick="resetSettings()">RÉINITIALISER</button>
+  <p id="settingsMsg"></p>
+</section>
+
+<section id="profile" class="section">
+  <h2>PROFIL & STATISTIQUES</h2>
+  <div class="cards">
+    <div class="card">Niveau<h2 id="profileLevel">1</h2></div>
+    <div class="card">Éliminations totales<h2 id="profileKills">0</h2></div>
+    <div class="card">Parties terminées<h2 id="profileGames">0</h2></div>
+  </div>
+  <div class="card"><h3>Progression</h3><p>Les statistiques sont enregistrées localement dans ce navigateur.</p><button onclick="resetStats()">Réinitialiser les statistiques</button></div>
+</section>
+</main>
+</div>
+<footer>STRIKE ZONE · Prototype indépendant · Aucun service multijoueur connecté</footer>
+
+<script>
+const types=["Ville","Désert","Forêt","Port","Montagne","Base militaire","Zone industrielle","Île","Métropole","Laboratoire"];
+const maps=Array.from({length:70},(_,i)=>({id:i+1,name:types[i%10]+" "+String(i+1).padStart(2,"0"),size:["Petite","Moyenne","Grande"][i%3]}));
+const typesW=["Fusil d'assaut","Mitraillette","Fusil de précision","Fusil à pompe","Mitrailleuse","Pistolet","Arme énergétique","Fusil tactique","Carabine","Arme expérimentale"];
+const weapons=Array.from({length:150},(_,i)=>({id:i+1,name:typesW[i%10]+" "+String(i+1).padStart(3,"0"),type:typesW[i%10],damage:20+(i*7)%61,ammo:[12,20,30,40,60][i%5],rarity:["Commun","Rare","Épique","Légendaire"][i%4]}));
+const $=id=>document.getElementById(id);
+let hp=100,kills=0,ammo=30,running=false,enemyTimer=null,moveTimer=null;
+let stats={kills:0,games:0};
+
+function go(id){
+document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+$(id).classList.add("active");
+document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+if(id==="profile")updateStats();
+}
+document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>go(b.dataset.page));
+
+function fillSelect(id,items){
+items.forEach(x=>$(id).add(new Option(x.name,x.id)));
+}
+function fillAll(){
+fillSelect("mapSelect",maps);
+["weaponSelect","slot1","slot2"].forEach(id=>fillSelect(id,weapons));
+renderMaps();renderWeapons();updateStats();
+}
+function renderMaps(){
+const q=$("mapSearch").value.toLowerCase();
+$("mapGrid").innerHTML="";
+maps.filter(m=>m.name.toLowerCase().includes(q)).forEach(m=>{
+const el=document.createElement("div");el.className="item";
+el.innerHTML="<b>"+m.name+"</b><small>Carte "+m.id+"/70 · "+m.size+"</small>";
+const btn=document.createElement("button");btn.textContent="Choisir cette carte";
+btn.onclick=()=>{$("mapSelect").value=m.id;go("play");};
+el.append(btn);$("mapGrid").append(el);
+});
+}
+function renderWeapons(){
+const q=$("weaponSearch").value.toLowerCase(),f=$("weaponFilter").value;
+$("weaponGrid").innerHTML="";
+weapons.filter(w=>w.name.toLowerCase().includes(q)&&(f==="Toutes"||w.type===f)).forEach(w=>{
+const el=document.createElement("div");el.className="item";
+el.innerHTML="<b>"+w.name+"</b><small>"+w.type+"<br>Dégâts : "+w.damage+"<br>Chargeur : "+w.ammo+"<br>Rareté : "+w.rarity+"</small>";
+const btn=document.createElement("button");btn.textContent="Équiper";
+btn.onclick=()=>{$("weaponSelect").value=w.id;$("slot1").value=w.id;go("loadout");};
+el.append(btn);$("weaponGrid").append(el);
+});
+}
+function quick(mode){$("mode").value=mode;go("play");}
+function startGame(){
+endGame(false);hp=100;kills=0;
+ammo=weapons[$("weaponSelect").value-1].ammo;
+$("hp").textContent=hp;$("kills").textContent=kills;$("ammo").textContent=ammo;
+$("game").style.display="block";
+$("feed").textContent="Mode : "+$("mode").value+" · "+$("difficulty").value;
+$("arena").querySelectorAll(".enemy").forEach(e=>e.remove());
+running=true;
+for(let i=0;i<Number($("botCount").value);i++)spawnEnemy();
+enemyTimer=setInterval(()=>{
+if(!running)return;
+const dmg=$("difficulty").value==="Facile"?2:$("difficulty").value==="Difficile"?9:5;
+hp=Math.max(0,hp-dmg);$("hp").textContent=hp;
+if(hp===0){$("feed").textContent="Tu as été éliminé !";endGame();}
+},5000);
+}
+function spawnEnemy(){
+const e=document.createElement("div");e.className="enemy";e.textContent="🎯";
+e.style.left=(5+Math.random()*85)+"%";e.style.top=(5+Math.random()*75)+"%";
+e.onclick=()=>{
+if(!running)return;
+if(ammo<=0){$("feed").textContent="Plus de munitions !";return;}
+ammo--;kills++;$("ammo").textContent=ammo;$("kills").textContent=kills;
+$("feed").textContent="Cible touchée ! +1 élimination";e.remove();
+if($("arena").querySelectorAll(".enemy").length===0){
+$("feed").textContent="Zone nettoyée ! Victoire !";endGame();
+}
+};
+$("arena").append(e);
+}
+function reload(){if(!running)return;ammo=weapons[$("weaponSelect").value-1].ammo;$("ammo").textContent=ammo;}
+function heal(){if(!running)return;hp=Math.min(100,hp+25);$("hp").textContent=hp;}
+function endGame(count=true){
+const wasRunning=running;running=false;clearInterval(enemyTimer);
+if(count&&wasRunning){stats.games++;stats.kills+=kills;saveStats();updateStats();}
+}
+function saveLoadout(){
+$("loadoutMsg").textContent="Équipement enregistré pour cette session.";
+}
+function saveOperator(){$("operatorMsg").textContent="Personnage appliqué.";}
+function saveSettings(){
+const values={};
+document.querySelectorAll("#settings input,#settings select").forEach(el=>{
+values[el.id]=el.type==="checkbox"?el.checked:el.value;
+});
+try{localStorage.setItem("sz_settings",JSON.stringify(values));}catch(e){}
+$("settingsMsg").textContent="Paramètres sauvegardés.";
+if($("fullscreen").checked&&!document.fullscreenElement)document.documentElement.requestFullscreen?.().catch(()=>{});
+document.documentElement.style.setProperty("--red",$("uiColor").value==="Bleu"?"#4098ff":$("uiColor").value==="Vert"?"#36c98c":"#ff563d");
+}
+function resetSettings(){
+if(!confirm("Réinitialiser les paramètres ?"))return;
+try{localStorage.removeItem("sz_settings");}catch(e){}
+location.reload();
+}
+function saveStats(){try{localStorage.setItem("sz_stats",JSON.stringify(stats));}catch(e){}}
+function updateStats(){
+$("totalKills").textContent=stats.kills;$("profileKills").textContent=stats.kills;
+$("totalGames").textContent=stats.games;$("profileGames").textContent=stats.games;
+const lvl=1+Math.floor(stats.kills/20);
+$("level").textContent=lvl;$("profileLevel").textContent=lvl;
+}
+function resetStats(){
+if(!confirm("Effacer les statistiques locales ?"))return;
+stats={kills:0,games:0};saveStats();updateStats();
+}
+try{stats=JSON.parse(localStorage.getItem("sz_stats"))||stats;}catch(e){}
+try{
+const values=JSON.parse(localStorage.getItem("sz_settings"))||{};
+Object.entries(values).forEach(([id,val])=>{if($(id)){if($(id).type==="checkbox")$(id).checked=val;else $(id).value=val;}});
+}catch(e){}
+fillAll();
+</script>
+</body>
+                                                                </html>
+                                                                
