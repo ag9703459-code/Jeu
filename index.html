@@ -1,366 +1,356 @@
-
+  
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>STRIKE ZONE | Menu principal</title>
+<meta name="viewport"
+ content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Strike Zone 3D</title>
 <style>
-:root {
-  --bg:#080d15;--panel:#111c2a;--line:#293c50;
-  --red:#ff563d;--text:#f4f7fc;--muted:#9cacc0;
-}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);
-font-family:Arial,sans-serif}
-button,input,select{font:inherit}
-button,select,input[type=text]{
-background:#19283a;color:white;border:1px solid var(--line);
-padding:11px;border-radius:5px}
-button{cursor:pointer;transition:.15s}
-button:hover,.active{background:var(--red);color:white}
-header{height:75px;display:flex;align-items:center;
-justify-content:space-between;padding:0 5%;
-border-bottom:1px solid var(--line);background:#0b121e}
-.logo{font-size:24px;font-weight:900;letter-spacing:3px}
-.logo span{color:var(--red)}
-.status{color:#91e4b2;font-size:12px}
-.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 75px)}
-aside{padding:20px 12px;border-right:1px solid var(--line);
-background:#0b121e}
-.nav{display:block;width:100%;text-align:left;margin-bottom:8px;
-background:transparent;border-color:transparent}
-.nav.active{background:#301e25;border-color:#74372e}
-.nav b{margin-right:10px}
-main{padding:24px;max-width:1400px;width:100%;margin:auto}
-.hero{min-height:220px;padding:30px;display:flex;align-items:center;
-background:linear-gradient(110deg,#182b40,#131e2c 60%,#46251f);
-border:1px solid #39485a;border-radius:10px;position:relative;overflow:hidden}
-.hero:after{content:"SZ";position:absolute;right:35px;top:15px;
-font-size:130px;font-weight:900;color:#ffffff09}
-.hero h1{font-size:clamp(32px,5vw,56px);margin:10px 0}
-.hero p{color:#c0ccdb}
-.tag{font-size:11px;color:var(--red);letter-spacing:3px;font-weight:bold}
-.primary{background:var(--red);border:0;font-weight:bold;padding:14px 22px}
-.secondary{margin-left:8px}
-h2{font-size:19px}
-h3{margin-top:0}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
-.card{background:var(--panel);border:1px solid var(--line);
-border-radius:8px;padding:16px;min-width:0}
-.card p,.muted,small{color:var(--muted)}
-.card button{width:100%;margin-top:8px}
-.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-.row>*{flex:1}
-label{display:block;margin:15px 0;color:#c4d0df}
-label input:not([type=checkbox]),label select{
-display:block;width:100%;margin-top:7px}
-input[type=range]{width:100%;accent-color:var(--red)}
-input[type=checkbox]{accent-color:var(--red)}
-.section{display:none}
-.section.active{display:block}
-.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:9px}
-.item{background:var(--panel);padding:12px;border:1px solid var(--line);border-radius:6px}
-.item small{display:block;margin-top:5px}
-#arena{height:330px;position:relative;overflow:hidden;
-background:linear-gradient(#172b40 0%,#344553 62%,#19241e 63%);
-border:2px solid #3a5266;border-radius:8px;margin:15px 0}
-#player{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:32px}
-.enemy{position:absolute;cursor:pointer;font-size:27px}
-footer{padding:20px;text-align:center;color:var(--muted);font-size:12px}
-@media(max-width:700px){
-.layout{grid-template-columns:1fr}
-aside{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;
-border-right:0;border-bottom:1px solid var(--line);padding:8px}
-.nav{text-align:center;font-size:12px;padding:9px 3px;margin:0}
-main{padding:12px}.hero{padding:20px}.hero:after{right:5px;font-size:80px}
+body{margin:0;background:#080d13;color:white;
+font-family:Arial,sans-serif;overflow:hidden}
+button{background:#182b3c;color:white;border:1px solid #456079;
+padding:12px;border-radius:7px;font-weight:bold;cursor:pointer}
+button:active{background:#287d91}
+#game{position:fixed;inset:0}
+#ui{position:fixed;inset:0;pointer-events:none}
+.panel{pointer-events:auto;background:#101b28ee;
+border:1px solid #345064;border-radius:12px;padding:20px}
+#menu{position:absolute;inset:0;display:flex;
+align-items:center;justify-content:center;
+background:linear-gradient(90deg,#07101bee,#07101b88,#07101b22)}
+.content{width:min(550px,90vw)}
+h1{font-size:clamp(32px,6vw,64px);margin:0 0 8px}
+h1 span{color:#50d9d0}
+p{color:#b6c6d5}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+#top{position:absolute;top:12px;left:12px;right:12px;
+display:none;justify-content:space-between;align-items:center}
+#catalog{position:absolute;inset:5%;display:none;
+overflow:auto;pointer-events:auto}
+#items{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+#items button{font-size:12px;min-height:60px}
+#cross{position:absolute;top:50%;left:50%;
+transform:translate(-50%,-50%);font-size:24px;color:#fff}
+#controls{position:absolute;bottom:18px;left:18px;right:18px;
+display:none;justify-content:space-between;align-items:end}
+.pad{display:grid;grid-template-columns:repeat(3,52px);gap:4px}
+.pad button{height:48px;background:#152638bb}
+#fire{width:82px;height:82px;border-radius:50%;
+background:#a62e31dd}
+#hint{position:absolute;bottom:8px;left:0;right:0;
+text-align:center;font-size:11px;color:#d6e1e9}
+@media(orientation:portrait){
+ #menu:after{content:"Tourne ton téléphone à l’horizontale ↻";
+ position:absolute;bottom:12px;left:5%;right:5%;
+ text-align:center;background:#162a3b;padding:12px;border-radius:8px}
 }
+@media(max-width:600px){#items{grid-template-columns:repeat(2,1fr)}
+.panel{padding:14px}.content{width:94vw}}
 </style>
 </head>
 <body>
-<header>
-  <div class="logo">STRIKE <span>ZONE</span></div>
-  <div class="status">● PROTOTYPE LOCAL</div>
-</header>
-
-<div class="layout">
-<aside>
-<button class="nav active" data-page="home"><b>⌂</b> Accueil</button>
-<button class="nav" data-page="play"><b>⚔</b> Jouer</button>
-<button class="nav" data-page="maps"><b>▦</b> Maps (70)</button>
-<button class="nav" data-page="weapons"><b>⌁</b> Arsenal (150)</button>
-<button class="nav" data-page="loadout"><b>▣</b> Équipement</button>
-<button class="nav" data-page="operator"><b>♙</b> Personnage</button>
-<button class="nav" data-page="settings"><b>⚙</b> Paramètres</button>
-<button class="nav" data-page="profile"><b>★</b> Profil & stats</button>
-</aside>
-
-<main>
-<section id="home" class="section active">
-  <div class="hero">
-    <div>
-      <div class="tag">SAISON 01 · COMBAT TACTIQUE</div>
-      <h1>PRÊT AU COMBAT ?</h1>
-      <p>Choisis ton terrain. Prépare ton arsenal. Entre dans la bataille.</p>
-      <button class="primary" onclick="go('play')">▶ JOUER</button>
-      <button class="secondary" onclick="go('loadout')">ÉQUIPEMENT</button>
-    </div>
+<div id="game"></div>
+<div id="ui">
+ <div id="menu">
+  <div class="content panel">
+   <p>JEU DE TIR • UNIVERS 3D</p>
+   <h1>STRIKE <span>ZONE</span></h1>
+   <p>Combattez dans des environnements urbains
+   et personnalisez votre équipement.</p>
+   <div class="buttons">
+    <button onclick="startGame()">▶ JOUER</button>
+    <button onclick="openCatalog('armes')">⚙ ARSENAL</button>
+    <button onclick="openCatalog('skins')">◈ CAMOUFLAGES</button>
+    <button onclick="openCatalog('maps')">▦ CARTES</button>
+   </div>
+   <p id="status">3D • Mode paysage • 50 cartes</p>
   </div>
-  <h2>ACCÈS RAPIDE</h2>
-  <div class="cards">
-    <div class="card"><h3>⚔ Battle Royale</h3><p>Survis et sois le dernier debout.</p><button onclick="quick('Battle Royale')">Sélectionner</button></div>
-    <div class="card"><h3>🎯 Match à mort</h3><p>Accumule des éliminations.</p><button onclick="quick('Match à mort')">Sélectionner</button></div>
-    <div class="card"><h3>🛡 Survie</h3><p>Affronte des vagues d'adversaires.</p><button onclick="quick('Survie')">Sélectionner</button></div>
-    <div class="card"><h3>♧ Entraînement</h3><p>Teste ton arme dans l'arène.</p><button onclick="quick('Entraînement')">Sélectionner</button></div>
+ </div>
+ <div id="top">
+  <button onclick="backMenu()">☰ MENU</button>
+  <b id="weaponLabel">ARME 01</b>
+  <button onclick="openCatalog('armes')">ARSENAL</button>
+ </div>
+ <div id="catalog" class="panel">
+  <button onclick="closeCatalog()">← RETOUR</button>
+  <h2 id="catTitle">ARSENAL</h2>
+  <p id="catInfo">Sélectionne un élément.</p>
+  <div id="items"></div>
+ </div>
+ <div id="cross" style="display:none">+</div>
+ <div id="controls">
+  <div class="pad">
+   <span></span><button data-move="forward">▲</button><span></span>
+   <button data-move="left">◀</button>
+   <button data-move="back">▼</button>
+   <button data-move="right">▶</button>
   </div>
-  <h2>TON PROFIL</h2>
-  <div class="cards">
-    <div class="card">Niveau <h2 id="level">1</h2></div>
-    <div class="card">Éliminations <h2 id="totalKills">0</h2></div>
-    <div class="card">Parties jouées <h2 id="totalGames">0</h2></div>
-    <div class="card">Maps disponibles <h2>70</h2></div>
-  </div>
-</section>
-
-<section id="play" class="section">
-  <h2>CONFIGURATION DE PARTIE</h2>
-  <div class="card">
-    <label>Mode de jeu<select id="mode">
-      <option>Battle Royale</option><option>Match à mort</option>
-      <option>Survie</option><option>Entraînement</option>
-      <option>Partie personnalisée</option>
-    </select></label>
-    <label>Carte<select id="mapSelect"></select></label>
-    <label>Arme principale<select id="weaponSelect"></select></label>
-    <label>Difficulté des bots<select id="difficulty">
-      <option>Facile</option><option selected>Normale</option><option>Difficile</option>
-    </select></label>
-    <label>Nombre de bots<select id="botCount">
-      <option>3</option><option selected>5</option><option>10</option><option>20</option>
-    </select></label>
-    <button class="primary" onclick="startGame()">LANCER LA PARTIE</button>
-  </div>
-  <div id="game" class="card" style="display:none;margin-top:15px">
-    <div class="cards">
-      <div class="item">❤️ Vie : <b id="hp">100</b></div>
-      <div class="item">🎯 Éliminations : <b id="kills">0</b></div>
-      <div class="item">🔫 Munitions : <b id="ammo">30</b></div>
-    </div>
-    <p id="feed">Clique sur un adversaire pour tirer.</p>
-    <div id="arena"><div id="player">🪖</div></div>
-    <button onclick="reload()">Recharger</button>
-    <button onclick="heal()">Soin</button>
-    <button onclick="endGame()">Quitter</button>
-  </div>
-</section>
-
-<section id="maps" class="section">
-  <h2>CHOISIR UNE CARTE</h2>
-  <input id="mapSearch" type="text" placeholder="Rechercher une carte..." oninput="renderMaps()" style="width:100%">
-  <p class="muted">70 cartes fictives générées pour le prototype.</p>
-  <div id="mapGrid" class="list"></div>
-</section>
-
-<section id="weapons" class="section">
-  <h2>ARSENAL</h2>
-  <input id="weaponSearch" type="text" placeholder="Rechercher une arme..." oninput="renderWeapons()" style="width:100%">
-  <div class="row">
-    <label>Catégorie<select id="weaponFilter" onchange="renderWeapons()"><option>Toutes</option><option>Fusil d'assaut</option><option>Mitraillette</option><option>Fusil de précision</option><option>Fusil à pompe</option><option>Mitrailleuse</option><option>Pistolet</option><option>Arme énergétique</option><option>Fusil tactique</option><option>Carabine</option><option>Arme expérimentale</option></select></label>
-  </div>
-  <div id="weaponGrid" class="list"></div>
-</section>
-
-<section id="loadout" class="section">
-  <h2>ÉQUIPEMENT</h2>
-  <div class="cards">
-    <div class="card"><h3>Emplacement 1</h3><label>Arme principale<select id="slot1"></select></label></div>
-    <div class="card"><h3>Emplacement 2</h3><label>Arme secondaire<select id="slot2"></select></label></div>
-    <div class="card"><h3>Emplacement 3</h3><label>Équipement tactique<select id="tactical"><option>Grenade fumigène</option><option>Grenade flash fictive</option><option>Balise de reconnaissance</option><option>Kit de soin</option></select></label></div>
-    <div class="card"><h3>Emplacement 4</h3><label>Protection<select id="armor"><option>Aucune</option><option>Armure légère</option><option>Armure renforcée</option><option>Armure lourde</option></select></label></div>
-  </div>
-  <button class="primary" onclick="saveLoadout()">ENREGISTRER L'ÉQUIPEMENT</button>
-  <p id="loadoutMsg"></p>
-</section>
-
-<section id="operator" class="section">
-  <h2>PERSONNALISATION DU PERSONNAGE</h2>
-  <div class="cards">
-    <div class="card"><h3>Apparence</h3><label>Opérateur<select id="skin"><option>Assaut</option><option>Reconnaissance</option><option>Ingénieur</option><option>Éclaireur</option></select></label><label>Couleur<select id="skinColor"><option>Bleu</option><option>Rouge</option><option>Vert</option><option>Noir</option></select></label></div>
-    <div class="card"><h3>Style de jeu</h3><label>Spécialité<select id="specialty"><option>Assaut</option><option>Défense</option><option>Soutien</option><option>Reconnaissance</option></select></label><p class="muted">Ces choix sont visuels dans cette version.</p></div>
-  </div>
-  <button onclick="saveOperator()">APPLIQUER</button><p id="operatorMsg"></p>
-</section>
-
-<section id="settings" class="section">
-  <h2>PARAMÈTRES COMPLETS</h2>
-  <div class="cards">
-    <div class="card"><h3>Vidéo</h3>
-      <label>Qualité<select id="graphics"><option>Faible</option><option selected>Moyenne</option><option>Élevée</option><option>Ultra</option></select></label>
-      <label>Résolution<select id="resolution"><option>Automatique</option><option>1280 × 720</option><option>1920 × 1080</option><option>2560 × 1440</option></select></label>
-      <label>FPS maximum<select id="fps"><option>30</option><option>60</option><option>120</option><option>144</option><option>Illimité</option></select></label>
-      <label><input type="checkbox" id="shadows" checked> Ombres</label>
-      <label><input type="checkbox" id="effects" checked> Effets visuels</label>
-      <label><input type="checkbox" id="fullscreen"> Plein écran</label>
-    </div>
-    <div class="card"><h3>Commandes</h3>
-      <label>Sensibilité souris <input id="sensitivity" type="range" min="1" max="100" value="50"></label>
-      <label>Champ de vision (FOV) <input id="fov" type="range" min="60" max="120" value="90"></label>
-      <label>Inverser l'axe vertical <input type="checkbox" id="invertY"></label>
-      <label>Visée automatique <input type="checkbox" id="aimAssist"></label>
-      <label>Afficher le viseur <input type="checkbox" id="crosshair" checked></label>
-    </div>
-    <div class="card"><h3>Audio</h3>
-      <label>Volume général <input id="volume" type="range" min="0" max="100" value="70"></label>
-      <label>Effets sonores <input id="sfx" type="range" min="0" max="100" value="80"></label>
-      <label>Musique <input id="music" type="range" min="0" max="100" value="35"></label>
-      <label><input type="checkbox" id="mute"> Mode silencieux</label>
-    </div>
-    <div class="card"><h3>Interface</h3>
-      <label>Taille du HUD <input id="hud" type="range" min="50" max="150" value="100"></label>
-      <label>Langue<select id="language"><option>Français</option><option>English</option><option>Español</option></select></label>
-      <label>Couleur de l'interface<select id="uiColor"><option>Rouge</option><option>Bleu</option><option>Vert</option></select></label>
-      <label><input type="checkbox" id="damageNumbers" checked> Afficher les dégâts</label>
-    </div>
-  </div>
-  <button class="primary" onclick="saveSettings()">APPLIQUER ET SAUVEGARDER</button>
-  <button onclick="resetSettings()">RÉINITIALISER</button>
-  <p id="settingsMsg"></p>
-</section>
-
-<section id="profile" class="section">
-  <h2>PROFIL & STATISTIQUES</h2>
-  <div class="cards">
-    <div class="card">Niveau<h2 id="profileLevel">1</h2></div>
-    <div class="card">Éliminations totales<h2 id="profileKills">0</h2></div>
-    <div class="card">Parties terminées<h2 id="profileGames">0</h2></div>
-  </div>
-  <div class="card"><h3>Progression</h3><p>Les statistiques sont enregistrées localement dans ce navigateur.</p><button onclick="resetStats()">Réinitialiser les statistiques</button></div>
-</section>
-</main>
+  <button id="fire">TIR</button>
+ </div>
+ <div id="hint"></div>
 </div>
-<footer>STRIKE ZONE · Prototype indépendant · Aucun service multijoueur connecté</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script>
-const types=["Ville","Désert","Forêt","Port","Montagne","Base militaire","Zone industrielle","Île","Métropole","Laboratoire"];
-const maps=Array.from({length:70},(_,i)=>({id:i+1,name:types[i%10]+" "+String(i+1).padStart(2,"0"),size:["Petite","Moyenne","Grande"][i%3]}));
-const typesW=["Fusil d'assaut","Mitraillette","Fusil de précision","Fusil à pompe","Mitrailleuse","Pistolet","Arme énergétique","Fusil tactique","Carabine","Arme expérimentale"];
-const weapons=Array.from({length:150},(_,i)=>({id:i+1,name:typesW[i%10]+" "+String(i+1).padStart(3,"0"),type:typesW[i%10],damage:20+(i*7)%61,ammo:[12,20,30,40,60][i%5],rarity:["Commun","Rare","Épique","Légendaire"][i%4]}));
 const $=id=>document.getElementById(id);
-let hp=100,kills=0,ammo=30,running=false,enemyTimer=null,moveTimer=null;
-let stats={kills:0,games:0};
+const weaponTypes=[
+ "Assaut","SMG","Précision","Soutien","Tactique",
+ "Éclaireur","Défense","Élite","Prototype","Légendaire"
+];
+const weapons=Array.from({length:100},(_,i)=>({
+ name:weaponTypes[i%10]+" "+String(i+1).padStart(2,"0"),
+ id:i
+}));
+const skins=[
+ "Forêt","Désert","Arctique","Urbain","Digital",
+ "Pixel","Carbone","Or","Nuit","Jungle",
+ "Océan","Rouge","Spectre","Neon","Hexagone",
+ "Marbre","Acier","Tropical","Cendre","Émeraude"
+];
+const camos=Array.from({length:100},(_,i)=>
+ skins[i%skins.length]+" "+String(i+1).padStart(2,"0"));
+const mapBases=[
+"Centre-ville","Désert","Port industriel","Base militaire",
+"Forêt dense","Montagnes","Entrepôt","Zone portuaire",
+"Quartier ancien","Complexe futuriste"
+];
+const maps=Array.from({length:50},(_,i)=>
+ mapBases[i%10]+" "+(Math.floor(i/10)+1));
+let scene,camera,renderer,player,gun,started=false;
+let selectedMap=0,selectedWeapon=0,selectedSkin=0;
+let buildings=[],bullets=[],enemies=[];
+let held={},lastTime=0;
 
-function go(id){
-document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-$(id).classList.add("active");
-document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
-if(id==="profile")updateStats();
+function init(){
+ scene=new THREE.Scene();
+ scene.background=new THREE.Color(0x9ab5c4);
+ scene.fog=new THREE.Fog(0x9ab5c4,35,150);
+ camera=new THREE.PerspectiveCamera(
+  75,innerWidth/innerHeight,.1,300);
+ renderer=new THREE.WebGLRenderer({antialias:true});
+ renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+ renderer.setSize(innerWidth,innerHeight);
+ renderer.shadowMap.enabled=true;
+ renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+ $("game").appendChild(renderer.domElement);
+ scene.add(new THREE.HemisphereLight(0xc6e4ff,0x444738,2));
+ const sun=new THREE.DirectionalLight(0xffedce,2.4);
+ sun.position.set(25,40,20);
+ sun.castShadow=true;
+ scene.add(sun);
+ buildMap();
+ player=new THREE.Group();
+ player.position.set(0,1.7,12);
+ scene.add(player);
+ camera.position.set(0,0,0);
+ player.add(camera);
+ camera.rotation.order="YXZ";
+ const g=new THREE.Group();
+ const body=new THREE.Mesh(
+  new THREE.BoxGeometry(.22,.18,.75),
+  new THREE.MeshStandardMaterial({color:0x283b42}));
+ body.position.set(.32,-.25,-.55);
+ g.add(body);
+ const barrel=new THREE.Mesh(
+  new THREE.CylinderGeometry(.035,.045,.65,8),
+  new THREE.MeshStandardMaterial({color:0x687985,metalness:.7}));
+ barrel.rotation.x=Math.PI/2;
+ barrel.position.set(.32,-.22,-1.05);
+ g.add(barrel);
+ camera.add(g);gun=g;
+ window.addEventListener("resize",resize);
+ window.addEventListener("keydown",e=>held[e.key.toLowerCase()]=true);
+ window.addEventListener("keyup",e=>held[e.key.toLowerCase()]=false);
+ renderer.domElement.addEventListener("click",()=>{
+  if(started&&$("catalog").style.display==="none")shoot();
+ });
+ renderer.domElement.addEventListener("pointermove",e=>{
+  if(!started||e.buttons!==2)return;
+  player.rotation.y-=e.movementX*.003;
+  camera.rotation.x-=e.movementY*.003;
+  camera.rotation.x=Math.max(-1.3,Math.min(1.3,camera.rotation.x));
+ });
+ renderer.domElement.addEventListener("contextmenu",e=>e.preventDefault());
+ setupTouch();
+ animate();
 }
-document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>go(b.dataset.page));
-
-function fillSelect(id,items){
-items.forEach(x=>$(id).add(new Option(x.name,x.id)));
+function material(color){
+ return new THREE.MeshStandardMaterial({
+  color,roughness:.83,metalness:.08
+ });
 }
-function fillAll(){
-fillSelect("mapSelect",maps);
-["weaponSelect","slot1","slot2"].forEach(id=>fillSelect(id,weapons));
-renderMaps();renderWeapons();updateStats();
+function addBox(x,y,z,w,h,d,color){
+ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),material(color));
+ m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;
+ scene.add(m);buildings.push(m);return m;
 }
-function renderMaps(){
-const q=$("mapSearch").value.toLowerCase();
-$("mapGrid").innerHTML="";
-maps.filter(m=>m.name.toLowerCase().includes(q)).forEach(m=>{
-const el=document.createElement("div");el.className="item";
-el.innerHTML="<b>"+m.name+"</b><small>Carte "+m.id+"/70 · "+m.size+"</small>";
-const btn=document.createElement("button");btn.textContent="Choisir cette carte";
-btn.onclick=()=>{$("mapSelect").value=m.id;go("play");};
-el.append(btn);$("mapGrid").append(el);
-});
+function clearMap(){
+ for(const b of buildings)scene.remove(b);
+ buildings=[];
 }
-function renderWeapons(){
-const q=$("weaponSearch").value.toLowerCase(),f=$("weaponFilter").value;
-$("weaponGrid").innerHTML="";
-weapons.filter(w=>w.name.toLowerCase().includes(q)&&(f==="Toutes"||w.type===f)).forEach(w=>{
-const el=document.createElement("div");el.className="item";
-el.innerHTML="<b>"+w.name+"</b><small>"+w.type+"<br>Dégâts : "+w.damage+"<br>Chargeur : "+w.ammo+"<br>Rareté : "+w.rarity+"</small>";
-const btn=document.createElement("button");btn.textContent="Équiper";
-btn.onclick=()=>{$("weaponSelect").value=w.id;$("slot1").value=w.id;go("loadout");};
-el.append(btn);$("weaponGrid").append(el);
-});
+function buildMap(){
+ clearMap();
+ const ground=new THREE.Mesh(
+  new THREE.PlaneGeometry(180,180),
+  material(0x777d70));
+ ground.rotation.x=-Math.PI/2;
+ ground.position.y=-.06;ground.receiveShadow=true;scene.add(ground);
+ const road=addBox(0,.01,0,14,.04,150,0x343a3e);
+ // Procedurally arranged buildings with doors and windows.
+ let seed=selectedMap+123;
+ const rand=()=>{seed=(seed*1664525+1013904223)>>>0;
+ return seed/4294967296};
+ for(let i=0;i<64;i++){
+  let x=(rand()-.5)*90,z=(rand()-.5)*100;
+  if(Math.abs(x)<11) x+=(x<0?-12:12);
+  if(Math.abs(z)<8&&Math.abs(x)<20)z+=18;
+  const w=4+rand()*8,h=4+rand()*17,d=5+rand()*8;
+  const palette=[0x747b82,0x9a8e7b,0x515f69,0xb1a28c,0x596b62];
+  addBox(x,h/2,z,w,h,d,palette[Math.floor(rand()*palette.length)]);
+  // Visible facade windows
+  const rows=Math.max(1,Math.floor(h/2.4));
+  const cols=Math.max(1,Math.floor(w/1.7));
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+   const wx=x-w/2+(c+.5)*w/cols;
+   const wy=1.3+r*2;
+   const wz=z-d/2-.026;
+   if(wy<h-.3){
+    const win=new THREE.Mesh(
+     new THREE.BoxGeometry(.65,.85,.06),
+     material(rand()>.45?0x8bc1cb:0x273947));
+    win.position.set(wx,wy,wz);scene.add(win);buildings.push(win);
+   }
+  }
+ }
+ // Cover objects and crates
+ for(let i=0;i<28;i++){
+  const x=(rand()-.5)*55,z=(rand()-.5)*65;
+  if(Math.abs(x)<9)continue;
+  addBox(x,.65,z,2.2,1.3,2,rand()>.5?0x536c59:0x8a704f);
+ }
+ // Simple target dummies
+ for(let i=0;i<7;i++){
+  const target=new THREE.Group();
+  const torso=new THREE.Mesh(new THREE.BoxGeometry(.8,1.1,.45),material(0x963e35));
+  torso.position.y=1.1;target.add(torso);
+  const head=new THREE.Mesh(new THREE.SphereGeometry(.27,10,8),material(0xc5a17d));
+  head.position.y=1.9;target.add(head);
+  target.position.set((i-3)*5,0,-18-Math.random()*15);
+  scene.add(target);enemies.push(target);
+ }
 }
-function quick(mode){$("mode").value=mode;go("play");}
+function resize(){
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
+ renderer.setSize(innerWidth,innerHeight);
+}
 function startGame(){
-endGame(false);hp=100;kills=0;
-ammo=weapons[$("weaponSelect").value-1].ammo;
-$("hp").textContent=hp;$("kills").textContent=kills;$("ammo").textContent=ammo;
-$("game").style.display="block";
-$("feed").textContent="Mode : "+$("mode").value+" · "+$("difficulty").value;
-$("arena").querySelectorAll(".enemy").forEach(e=>e.remove());
-running=true;
-for(let i=0;i<Number($("botCount").value);i++)spawnEnemy();
-enemyTimer=setInterval(()=>{
-if(!running)return;
-const dmg=$("difficulty").value==="Facile"?2:$("difficulty").value==="Difficile"?9:5;
-hp=Math.max(0,hp-dmg);$("hp").textContent=hp;
-if(hp===0){$("feed").textContent="Tu as été éliminé !";endGame();}
-},5000);
+ $("menu").style.display="none";
+ $("top").style.display="flex";
+ $("cross").style.display="block";
+ $("controls").style.display="flex";
+ $("hint").textContent="ZQSD / WASD pour bouger • clic pour tirer • clic droit + souris pour regarder";
+ started=true;
 }
-function spawnEnemy(){
-const e=document.createElement("div");e.className="enemy";e.textContent="🎯";
-e.style.left=(5+Math.random()*85)+"%";e.style.top=(5+Math.random()*75)+"%";
-e.onclick=()=>{
-if(!running)return;
-if(ammo<=0){$("feed").textContent="Plus de munitions !";return;}
-ammo--;kills++;$("ammo").textContent=ammo;$("kills").textContent=kills;
-$("feed").textContent="Cible touchée ! +1 élimination";e.remove();
-if($("arena").querySelectorAll(".enemy").length===0){
-$("feed").textContent="Zone nettoyée ! Victoire !";endGame();
+function backMenu(){
+ started=false;
+ $("menu").style.display="flex";$("top").style.display="none";
+ $("controls").style.display="none";$("cross").style.display="none";
+ $("hint").textContent="";
+ closeCatalog();
 }
-};
-$("arena").append(e);
+function openCatalog(type){
+ const titles={armes:"ARSENAL — 100 ARMES",
+ skins:"CAMOUFLAGES — 100 MOTIFS",maps:"CARTES — 50 ENVIRONNEMENTS"};
+ $("catTitle").textContent=titles[type];
+ $("catInfo").textContent=type==="armes"?
+ "Choisis ton équipement.":
+ type==="skins"?"Choisis l'apparence de ton arme.":
+ "Choisis un environnement 3D.";
+ const list=type==="armes"?weapons.map(w=>w.name):
+ type==="skins"?camos:maps;
+ $("items").innerHTML="";
+ list.forEach((name,i)=>{
+  const b=document.createElement("button");
+  b.textContent=String(i+1).padStart(2,"0")+" · "+name;
+  b.onclick=()=>{
+   if(type==="armes"){
+    selectedWeapon=i;$("weaponLabel").textContent=name;
+    gun.children.forEach(o=>{
+     if(o.material)o.material.color.setHex(
+      [0x283b42,0x45513a,0x777777,0x8b6d43][i%4]);
+    });
+   }else if(type==="skins"){
+    selectedSkin=i;
+    gun.children.forEach(o=>{
+     if(o.material)o.material.color.setHSL((i%100)/100,.6,.45);
+    });
+   }else{
+    selectedMap=i;buildMap();
+    player.position.set(0,1.7,12);
+   }
+   $("catInfo").textContent="Sélectionné : "+name;
+  };
+  $("items").appendChild(b);
+ });
+ $("catalog").style.display="block";
 }
-function reload(){if(!running)return;ammo=weapons[$("weaponSelect").value-1].ammo;$("ammo").textContent=ammo;}
-function heal(){if(!running)return;hp=Math.min(100,hp+25);$("hp").textContent=hp;}
-function endGame(count=true){
-const wasRunning=running;running=false;clearInterval(enemyTimer);
-if(count&&wasRunning){stats.games++;stats.kills+=kills;saveStats();updateStats();}
+function closeCatalog(){$("catalog").style.display="none"}
+function shoot(){
+ const dir=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);
+ const mesh=new THREE.Mesh(new THREE.SphereGeometry(.07,6,6),
+ material(0xffd37a));
+ mesh.position.copy(camera.getWorldPosition(new THREE.Vector3()));
+ scene.add(mesh);bullets.push({mesh,dir,life:1.5});
 }
-function saveLoadout(){
-$("loadoutMsg").textContent="Équipement enregistré pour cette session.";
+function setupTouch(){
+ document.querySelectorAll("[data-move]").forEach(btn=>{
+  const k=btn.dataset.move;
+  const on=()=>held["touch_"+k]=true;
+  const off=()=>held["touch_"+k]=false;
+  btn.addEventListener("pointerdown",e=>{e.preventDefault();on()});
+  ["pointerup","pointercancel","pointerleave"].forEach(ev=>
+   btn.addEventListener(ev,off));
+ });
+ $("fire").addEventListener("pointerdown",e=>{e.preventDefault();shoot()});
+ let lastX=0,lastY=0;
+ renderer.domElement.addEventListener("touchstart",e=>{
+  if(e.touches.length){lastX=e.touches[0].clientX;lastY=e.touches[0].clientY}
+ },{passive:true});
+ renderer.domElement.addEventListener("touchmove",e=>{
+  if(!started||$("catalog").style.display!=="none")return;
+  const t=e.touches[0],dx=t.clientX-lastX,dy=t.clientY-lastY;
+  if(t.clientX>innerWidth*.35){
+   player.rotation.y-=dx*.006;
+   camera.rotation.x=Math.max(-1.2,Math.min(1.2,camera.rotation.x-dy*.004));
+  }
+  lastX=t.clientX;lastY=t.clientY;
+ },{passive:true});
 }
-function saveOperator(){$("operatorMsg").textContent="Personnage appliqué.";}
-function saveSettings(){
-const values={};
-document.querySelectorAll("#settings input,#settings select").forEach(el=>{
-values[el.id]=el.type==="checkbox"?el.checked:el.value;
-});
-try{localStorage.setItem("sz_settings",JSON.stringify(values));}catch(e){}
-$("settingsMsg").textContent="Paramètres sauvegardés.";
-if($("fullscreen").checked&&!document.fullscreenElement)document.documentElement.requestFullscreen?.().catch(()=>{});
-document.documentElement.style.setProperty("--red",$("uiColor").value==="Bleu"?"#4098ff":$("uiColor").value==="Vert"?"#36c98c":"#ff563d");
+function animate(time=0){
+ requestAnimationFrame(animate);
+ const dt=Math.min((time-lastTime)/1000,.04);lastTime=time;
+ if(started&&$("catalog").style.display==="none"){
+  const speed=9*dt;
+  const forward=new THREE.Vector3(0,0,-1).applyAxisAngle(
+   new THREE.Vector3(0,1,0),player.rotation.y);
+  const right=new THREE.Vector3(1,0,0).applyAxisAngle(
+   new THREE.Vector3(0,1,0),player.rotation.y);
+  if(held.w||held.z||held.touch_forward)player.position.addScaledVector(forward,speed);
+  if(held.s||held.touch_back)player.position.addScaledVector(forward,-speed);
+  if(held.a||held.q||held.touch_left)player.position.addScaledVector(right,-speed);
+  if(held.d||held.touch_right)player.position.addScaledVector(right,speed);
+ }
+ bullets=bullets.filter(b=>{
+  b.mesh.position.addScaledVector(b.dir,35*(1/60));
+  b.life-=1/60;
+  if(b.life<=0){scene.remove(b.mesh);return false}return true;
+ });
+ renderer.render(scene,camera);
 }
-function resetSettings(){
-if(!confirm("Réinitialiser les paramètres ?"))return;
-try{localStorage.removeItem("sz_settings");}catch(e){}
-location.reload();
-}
-function saveStats(){try{localStorage.setItem("sz_stats",JSON.stringify(stats));}catch(e){}}
-function updateStats(){
-$("totalKills").textContent=stats.kills;$("profileKills").textContent=stats.kills;
-$("totalGames").textContent=stats.games;$("profileGames").textContent=stats.games;
-const lvl=1+Math.floor(stats.kills/20);
-$("level").textContent=lvl;$("profileLevel").textContent=lvl;
-}
-function resetStats(){
-if(!confirm("Effacer les statistiques locales ?"))return;
-stats={kills:0,games:0};saveStats();updateStats();
-}
-try{stats=JSON.parse(localStorage.getItem("sz_stats"))||stats;}catch(e){}
-try{
-const values=JSON.parse(localStorage.getItem("sz_settings"))||{};
-Object.entries(values).forEach(([id,val])=>{if($(id)){if($(id).type==="checkbox")$(id).checked=val;else $(id).value=val;}});
-}catch(e){}
-fillAll();
+init();
 </script>
 </body>
-                                                                </html>
-                                                                
+</html>
